@@ -1,0 +1,89 @@
+html {
+height:100%; 
+font-size:100%;
+}
+
+body {
+height:100%; 
+font-size:100%;
+background:url(media/images/knots.png);
+}
+
+#editBlocker {
+height:100%; 
+font-size:100%;
+-webkit-user-select: none;
+-khtml-user-select: none;
+-moz-user-select: -moz-none;
+-o-user-select: none;
+user-select: none;
+}
+
+#IO {
+text-align:center; 
+margin:auto;
+background-color:black; 
+/* background:url(media/images/parchment.png); */
+height:60%; 
+width:50%; 
+font-size:100%;
+}
+
+#yggdrsill {
+height:15%; 
+width:100%; 
+position:relative;
+margin:auto auto 5% auto;
+}
+
+#blocker {
+height:100%;
+width:100%;
+z-index:3;
+position:absolute;
+left:0px;
+top:0px;
+}
+
+.upperCased {
+height:100%; 
+width:8%;
+}
+
+.lowerCased {
+height:50%; 
+width:4%;
+}
+
+#inputDiv {
+height:10%; 
+width:100%; 
+font-size:100%;
+}
+
+#inputBox {
+height:30%; 
+width:80%; 
+font-size:60%;
+/* background-color:#FFDB7C; */
+color:black;
+margin:2% auto auto auto;
+}
+
+#enterButton {
+height:40%; 
+width:10%; 
+text-align:center;
+margin:2% auto auto auto;
+}
+
+.displays {
+display:inline-block; 
+height:100%; 
+width:40%; 
+/* background-color:#FFDB7C;
+color:red; */
+background-color:white;
+overflow-y:scroll; 
+text-align:left;
+}

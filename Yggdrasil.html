@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+   <meta charset="UTF-8"/>
+   <script src="Yggdrasil.js"></script>
+   <link rel="stylesheet" type="text/css" href="Yggdrasil.css">
+   <title>Yggdrasil Text-Based Game</title>
+</head>
+<body onload="game = new yggdrasil(); game.startGame();">
+<div id="editBlocker" contenteditable="false" contextmenu="noMenu">
+    <menu id="noMenu"></menu>
+    <div id="IO">
+        <div id="yggdrsill">
+            <img src="media/images/futhark/wunjo.gif" class="upperCased" alt="Y">
+            <img src="media/images/futhark/gebo.gif" class="lowerCased" alt="g">
+            <img src="media/images/futhark/gebo.gif" class="lowerCased" alt="g">
+            <img src="media/images/futhark/dagaz.gif" class="lowerCased" alt="d">
+            <img src="media/images/futhark/raidho.gif" class="lowerCased" alt="r">
+            <img src="media/images/futhark/ansuz.gif" class="lowerCased" alt="a">
+            <img src="media/images/futhark/sowilo.gif" class="lowerCased" alt="s">
+            <img src="media/images/futhark/isa.gif" class="lowerCased" alt="i">
+            <img src="media/images/futhark/laguz.gif" class="lowerCased" alt="l">
+            <img src="media/images/futhark/laguz.gif" class="lowerCased" alt="l">
+            <img src="media/images/img.gif" id="blocker" alt="">
+        </div>
+        <audio loop autoplay src="media/music/Eg%20veit%20i%20himmerik%20ei%20borg.wav"></audio>
+        <div id="textDisplay" style="height:65%;">
+            <div id="roomDescription" class="displays" style="margin:auto 3% auto auto;"></div>
+            <div id="messageDisplay" class="displays" style="margin:auto auto auto 3%;"></div>
+        </div>
+        <div id="inputDiv"> 
+            <input id="inputBox" type="text" autofocus onkeyup="enterCheck(event, game);">
+            <!--
+            <button id="enterButton" onclick="game.processCommand(document.getElementById('inputBox').value);"></button>
+            -->
+        </div>
+    </div>
+</div>
+</body>
+</html>
