@@ -15,7 +15,8 @@ function yggdrasil()
 	this.player = '';
 	this.curWorld = '';
 	this.worldMidgard = '';
-	this.worldTest = '';
+	this.worldVanaheim = '';
+	this.worldJontunheim = '';
 	
 	//Set methods
 	this.startGame = startGame;
@@ -28,21 +29,20 @@ function yggdrasil()
 	*/
 	function startGame()
 	{
-    //Create player
-    player = createPlayer();
-	
+		//Create player
+		player = createPlayer();
+		
 		//Create worlds
-		worldTest = createTestWorld();
 		worldMidgard = createMidgardWorld();
-		
-		//Set current world.
-		curWorld = worldTest;
-		
-		alert(curWorld.name);
-		
+		worldVanaheim = createVanaheimWorld();
+		worldJotunheim = createJotunheimWorld();
+			
+		//Set current world to Midgard
+		curWorld = worldMidgard;
+			
 		//Display room
 		displayRoom();
-		
+			
 		//Process enter events
 		processStartEvents();
 	}
@@ -83,6 +83,11 @@ function yggdrasil()
 			{
 				dropItem(cmd);
 			}
+			//Else check for help verb
+			else if( cmd.search(' HELP ') != -1 )
+			{
+				displayHelp(cmd);
+			}
 			//Else check for view verb
 			else if( cmd.search(' VIEW ') != -1)
 			{
@@ -115,6 +120,30 @@ function yggdrasil()
 						//Set valid move flag, to process enter events
 						validMove = true;
 					}
+					//Check if vanaheim world target
+					else if( cmd.search( ' VANAHEIM ') != -1)
+					{
+						//Move current world
+						curWorld = worldVanaheim;
+						
+						//Change start room
+						curWorld.curRoom = worldVanaheim.startRoom;
+						
+						//Set valid move flag, to process enter events
+						validMove = true;
+					}
+					//Check if vanaheim world target
+					else if( cmd.search( ' JOTUNHEIM ') != -1)
+					{
+						//Move current world
+						curWorld = worldJotunheim;
+						
+						//Change start room
+						curWorld.curRoom = worldJotunheim.startRoom;
+						
+						//Set valid move flag, to process enter events
+						validMove = true;
+					}
 				}
 				//Else not in Midgard message user
 				else
@@ -139,12 +168,10 @@ function yggdrasil()
 		
 		//Display room
 		displayRoom();
+	
+		//Process start events
+		processStartEvents();
 		
-		//If valid move check for enter events
-		if( validMove )
-		{
-			processStartEvents();
-		}
 	}
 	
 	/*
@@ -342,25 +369,44 @@ function yggdrasil()
 	}
 	
 	/*
+	Description: Displays help.
+	Pre-Conditions: None.
+	Post-Conditions: Displays help in messages box.
+	*/
+	function displayHelp(cmd)
+	{
+		message('*** HELP ***');
+		message('Move <direction> - moves to another room, based on direction. Allows north, south, east, west.');
+		message('Pick up <item> - picks up target item. Item must exist in room.');
+		message('Get <item> - same as Pick Up, see above.');
+		message('Drop <item> - drops item in room. Item must be inventory.');
+		message('View inventory - displays items in inventory.');
+		message('View items - same as View Inventory, see above.');
+		message('Warp <world> - warps to target world. Can only use command in Midgard.');
+		message('Reset - resets game.');
+		message('*** END HELP ***');
+	}
+	
+	/*
 	Description: Lists all items to user in a message.
 	Pre-Conditions: Player object set up properly.
 	Post-Conditions: Messages user an item list.
 	*/
 	function viewItems()
 	{
-		//Create message string
-		var msg = ' ';
+		//Display header
+		message('*** INVENTORY ***');
 		
 		//Cycle through items
 		var len = player.items.length;
 		for( var n = 0; n < len; n++ )
 		{
-			//Add item to message string
-			msg += player.items[n].name + '\n';
+			//Display item name
+			message( player.items[n].name );
 		}
 		
-		//Message user item list
-		message(msg);
+		//Display closer
+		message('*** END INVENTORY ***');
 	}
 	
 	/*
@@ -410,7 +456,7 @@ function yggdrasil()
 		var found = false;
 		var rCmd, event;
 
-		for( var n = 0;((n < len) && !found); n++ )
+			for( var n = 0;((n < len) && !found); n++ )
 		{
 			//Get event and trigger command
 			event = curWorld.curRoom.events[n];
@@ -465,14 +511,14 @@ function yggdrasil()
 			event.action();
 			
 			//Verify if auto delete is on
-			if( event.autoDelete == true )
+			if( event.autoDelete )
 			{
-	      //Remove event from room
-        var index = curWorld.curRoom.events.indexOf(event);
-        if( index != -1 )
-        {
-          curWorld.curRoom.events.splice(index,1);
-        }
+        		  //Remove event from room
+				var index = curWorld.curRoom.events.indexOf(event);
+				if( index != -1 )
+				{
+				  curWorld.curRoom.events.splice(index,1);
+				}
 			}
 		}
 		
@@ -488,25 +534,27 @@ function yggdrasil()
 	*/
   function processStartEvents()
   {
-      //Cycle through enter events
-			var len = curWorld.curRoom.enterEvents.length;
-			for( var c = 0; c < len; c++ )
-			{
-				//Trigger event code
-				curWorld.curRoom.enterEvents[c].action();
-			}
+     //Cycle through enter events
+	var len = curWorld.curRoom.enterEvents.length;
+
+	for( var c = 0; c < len; c++ )
+	{
+		//Trigger event code
+		curWorld.curRoom.enterEvents[c].action();
+	}
 			
-			//Remove all enter events with auto delete on
-			var event;
-			for( c = len - 1; c >= 0; c-- )
-			{
-          event = curWorld.curRoom.enterEvents[c];
-          
-          if( event.autoDelete == true )
-          {
-            curWorld.curRoom.enterEvents.splice(c,1);
-          }
-			}
+	//Remove all enter events with auto delete on
+	var event;
+	for( c = len - 1; c >= 0; c-- )
+	{
+	  event = curWorld.curRoom.enterEvents[c];
+			  
+	  if( event.autoDelete )
+	  {
+
+		curWorld.curRoom.enterEvents.splice(c,1);
+	  }
+	}
   }
   
   /*
@@ -669,50 +717,299 @@ function yggdrasil()
 
  // ### ------------------------------------- World Creation ------------------------------------ ### //
 
-  function test()
-  {
-    alert('event trigger');
-  }
-
-  function test2()
-  {
-    alert('event start');
-  }
-
-  function createMidgardWorld()
-  {
-    room1 = new room("Migard world...",'','','','',[],[],[]);
-    return new world("Midgard",room1,room1);
-  }
-
-  function createTestWorld()
-  {
-    //Create items
-    item1 = new item("BALL","A red ball.");
-    item2 = new item("KEY","Key to castle door.");
-    item3 = new item("KNIFE","A sharp knife.");
-    
-    
-    //Create commands
-    com3 = new command('RUN', 'ALL', 'TREE');
-    eventT = new event("Event 1",com3,test,true);
-    eventS = new event("Event 2",'',test2,true);
-
-    
-    //Create rooms
-    room1 = new room("You are at the entrance of a dark castle. There is a locked door.",'',"EXIT",'','',[item1,item2],[eventT],[]);
-    room2 = new room("You are in the foyer of an evil place...","","","","",[item3],[],[eventS]);
-    
-    //Link rooms
-    room1.north = room2;
-    room2.south = room1;
-    
-    //Create world object
-    worldtest = new world("Test World",room1,room1);
-    
-    //Return world object
-    return worldtest;
-  }
+	function createMidgardWorld()
+	{
+		//Create events
+		m_startEvent = new event('Start Event','',
+			function()
+			{
+				message('Welcome ' + player.name + '. I am Me\'mir. The world of Yggdrasil is in chaos. The twin jotun Glap and Greip are terrorizing the land of Asgard. The souls of the ' +
+						'warriors who died in battle cannot rest in Asgard. They are ' + 
+				        'so hard to defeat as one can revive the other, so they both must be defeated in one blow. The only weapon capable of doing this is ' + 
+						'the legendary sword, Fragarach. It was shattered long ago, but the shards are scattered around Yggdrasil. Find the shards and bring them ' + 
+						'to Volundr the blacksmith in Hel. With the sword you must travel to Asgard and defeat Glap and Greip.');
+			},true);
+			
+		//Creates rooms
+		m_room1 = new room("You are in Midgard. Me\'mir stands before you. He tells you that he can warp you to the different worlds in Yggdrasil.(Warp) You can go to " +
+			"Vanaheim, " +
+			"Jotunheim, ",'','','','',[],[],[m_startEvent]);
+			
+		//Return new world object
+		return new world("Midgard",m_room1,m_room1);
+	}
+  
+	/*
+	Description: Creates Vanaheim world objects. 
+	Map:		4
+				|
+			6 - 3 -	5
+				|
+				1 -	2
+	Items: 2 - Jewel to skip trickster riddle.
+	       5 - Vault key to unlock door in room 3.
+		   6 - Sword shard.
+	Enter Events:	4 - Drauger appears and sends you back to Midgard.
+					5 - Trickster appears and must be given a jewel or answered his riddle to leave vault key.
+	Trigger Events: 5 - 'Give' 'Jewel' 'Trickster' makes trickster leave.
+					5 - 'A' 'Stamp' makes trickster leave.
+	Preconditions: None.
+	Postconditions: Returns vanaheim world object.
+	*/
+	function createVanaheimWorld()
+	{
+		//Create items
+		v_doorKey = new item('VAULT KEY',"Key to vault door was left by the trickster.(Vault Key)");
+		v_jewel = new item('JEWEL',"A shiny jewel sparkles through the dirt.(Jewel)");
+		v_swordShard = new item('SWORD SHARD','The sword shard lies on a pedistal.(Sword Shard)');
+		
+		//Create commands
+		v_openDoor = new command('USE','VAULT KEY','DOOR');
+		v_giveJewel = new command('GIVE','JEWEL','TRICKSTER');
+		v_answerRiddle = new command('A','','STAMP');
+		
+		//Create events
+		v_openDoorEvent = new event('Open vault door',v_openDoor,
+			function()
+			{
+				v_room3.description = "You are in a deralict foyer. The vault door to the west is now open. (Door) The door on the east is open. A dark entryway lies to the north.";
+				v_room3.west = v_room6;
+			},true);
+		v_tricksterEvent = new event('Trickster enter','',
+			function()
+			{
+				appendOutputText('A trickster appears! (Trickster) It asks you for something shiny, or you must answer a riddle: What travels the world but stays in a corner?');
+			},false);
+		v_tricksterEventGive = new event('Trickster Give',v_giveJewel,v_removeTrickster,true);
+		v_tricksterEventAnswer = new event('Trickster answer',v_answerRiddle,v_removeTrickster,true);
+		v_drauger = new event('Drauger','',
+			function()
+			{
+				alert('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
+				moveToMidgard();
+				displayRoom();
+			},false);
+		
+		//Event functions
+		function v_removeTrickster()
+		{
+			message('The trickster ran away.');
+			v_room5.description = "You are in a strange smelling room.";
+			v_room5.items = [v_doorKey];
+			v_room5.enterEvents = [];
+			v_room5.events = [];
+		}
+		
+		//Create rooms
+		v_room1 = new room("You are in a dark forest. There is an overgrown stone archway to the north. A small break in the dense foilage is to the east. The portal to Midgard is to your south.",'','EXIT','','',[],[],[]);
+		v_room2 = new room("You are in a small clearing surrounded by dense trees.",'','','','',[v_jewel],[],[]);
+		v_room3 = new room("You are in a deralict foyer. There is a locked vault door to the west. The door on the east is open. An ominous dark entryway lies to the north.",'','','','',[],[v_openDoorEvent],[]);
+		v_room4 = new room("You are in an empty storage room.",'','','','',[],[],[v_drauger]);
+		v_room5 = new room("You are in a strange smelling room.",'','','','',[],[v_tricksterEventGive,v_tricksterEventAnswer],[v_tricksterEvent]);
+		v_room6 = new room('You are in an ornate room.','','','','',[v_swordShard],[],[]);
+		
+		//Link rooms
+		v_room1.east = v_room2;
+		v_room1.north = v_room3;
+		v_room2.west = v_room1;
+		v_room3.south = v_room1;
+		v_room3.north = v_room4;
+		v_room3.east = v_room5;
+		v_room4.south = v_room3;
+		v_room5.west = v_room3;
+		v_room6.east = v_room3;
+		
+		//Create and return new world
+		return new world('Vanaheim',v_room1,v_room1);
+	}
+	
+	/*
+	Description: Creates Jotunheim world objects. 
+	Map:		5
+				|
+			4 - 3 	8
+				|	|
+			1 -	2 -	6
+					|
+					7
+	Items: 4 - Sling shot after winning rock paper sissors.
+	       7 - Stone on ground.
+		   8 - Sword shard.
+	Enter Events:	4 - Rock paper sissor game with jotun, when you win leaves sling shot.
+					5 - Gaint throws you to Midgard.
+					6 - A giant blocks the bridge north. You must user sling shot and have a stone to beat him. If you move north while he is there he throws you to Midgard.
+	Trigger Events: 4 - 'Play' 'Rock' plays rock in RPS
+					4 - 'Play' 'Paper' plays paper in RPS
+					4 - 'Play' 'Sissors' plays sissors in RPS
+					6 - 'USe' 'sling shot' 'jotun' kills jotun on bridge.
+	Preconditions: None.
+	Postconditions: Returns Jotunheim world object.
+	*/
+	function createJotunheimWorld()
+	{
+		//Create items
+		j_sling = new item('SLING SHOT','The jotun left a sling shot for you.(Sling Shot)');
+		j_stone = new item('STONE','A perfectly round stone lies on the ground.(Stone)');
+		j_swordShard = new item('SWORD SHARD','A sword shard is held out in the statues hand.(Sword Shard)');
+		
+		//Create commands
+		j_useSling = new command('USE','SLING SHOT','jotun');
+		j_playRock = new command('PLAY','','ROCK');
+		j_playPaper = new command('PLAY','','PAPER');
+		j_playSissors = new command('PLAY','','SISSORS');
+		j_moveBridge = new command('MOVE','','NORTH');
+		
+		//Create rock paper sissors text array
+		rpsText = ['rock','paper','sissors'];
+		
+		//Create events
+		j_playRPSEvent = new event('Rock paper sissors','',
+			function()
+			{
+				appendOutputText('A jotun sits in the chair watching you. He tells you he will give you an item if you win a game of rock paper sissors.(PLAY)');
+			},false);
+		j_playRockEvent = new event('Play rock',j_playRock,
+			function()
+			{
+				var play = Math.floor( Math.random() * 3);
+				
+				message('The jotun plays ' + rpsText[play] + '.');
+				
+				if( play == 2 )
+				{
+					message('Rock beats sissors. You win!');
+					
+					j_room4.enterEvents = [];
+					j_room4.events = [];
+					j_room4.items = [j_sling];
+				}
+				else if( play == 1 )
+				{
+					message('Paper beats rock. The jotun wins.');
+				}
+				else
+				{
+					message('Rock ties rock. No winner.');
+				}
+			},false);
+		j_playPaperEvent = new event('Play paper',j_playPaper,
+			function()
+			{
+				var play = Math.floor( Math.random() * 3);
+				
+				message('The jotun plays ' + rpsText[play] + '.');
+				
+				if( play == 0 )
+				{
+					message('Paper beats rock. You win!');
+					
+					j_room4.enterEvents = [];
+					j_room4.events = [];
+					j_room4.items = [j_sling];
+				}
+				else if( play == 2 )
+				{
+					message('Sissors beats paper. The jotun wins.');
+				}
+				else
+				{
+					message('Paper ties paper. No winner.');
+				}
+			},false);
+		j_playSissorsEvent = new event('Play sissors',j_playSissors,
+			function()
+			{
+				var play = Math.floor( Math.random() * 3);
+				
+				message('The jotun plays ' + rpsText[play] + '.');
+				
+				if( play == 1 )
+				{
+					message('Sissors beats paper. You win!');
+					
+					j_room4.enterEvents = [];
+					j_room4.events = [];
+					j_room4.items = [j_sling];
+				}
+				else if( play == 0 )
+				{
+					message('Rock beats sissors. The jotun wins.');
+				}
+				else
+				{
+					message('Sissors ties sissors. No winner.');
+				}
+			},false);
+		j_jotunThrow = new event('jotun throw','',
+			function()
+			{
+				alert('The jotun is angry with you. He picks you up and throws you to Midgard.');
+				moveToMidgard();
+				displayRoom();
+			},false);
+		j_jotunThrow2 = new event('jotun throw bridge',j_moveBridge,
+			function()
+			{
+				alert('The jotun throws you off the bridge. You wake up in Midgard.');
+				moveToMidgard();
+				displayRoom();
+			},false);
+		j_jotunBarrier = new event('jotun barrier','',
+			function()
+			{
+				appendOutputText('A jotun stands guard on the bridge.(Jotun)');
+			},false);
+		j_useSlingShot = new event('Use sling shot',j_useSling,
+			function()
+			{
+				if( player.items.indexOf(j_stone) != - 1)
+				{
+					message('The stone hits the jotun in the forehead and kills him.');
+					
+					j_room6.enterEvents = [];
+					j_room6.events = [];
+					
+					var index = player.items.indexOf(j_stone);
+					if( index != -1)
+					{
+						player.items.splice(index,1);
+					}
+				}
+				else
+				{
+					message('You need a stone to use in your sling shot.');
+				}
+			},false);
+			
+		//Create room objects
+		j_room1 = new room('An archway stands before you on the east, that no man could have built. The portal to Midgard lies to the west.','','','','EXIT',[],[],[]);
+		j_room2 = new room('A giant hallway runs north. Large archways built by jotun lie to your west and east.','','','','',[],[],[]);
+		j_room3 = new room('The hallway continues north and south. A large door lies to the west.','','','','',[],[],[]);
+		j_room4 = new room('Your in a room with a giant chair in the middle.','','','','',[],[j_playRockEvent,j_playPaperEvent,j_playSissorsEvent],[j_playRPSEvent]);
+		j_room5 = new room('The hallway continues north seemingly endless.','','','','',[],[],[j_jotunThrow]);
+		j_room6 = new room('Your in a room with a vaulted ceiling, so large it has its own weather. There are doors to the south and west. A large bridge runs to the north.','','','','',[],[j_jotunThrow2,j_useSlingShot],[j_jotunBarrier]);
+		j_room7 = new room('Your in a room still under construction. There is a door to the north.','','','','',[j_stone],[],[]);
+		j_room8 = new room('Your in some sort of shrine. A large stone jotun statue is before you.','','','','',[j_swordShard],[],[]);
+		
+		//Line rooms
+		j_room1.east = j_room2;
+		j_room2.west = j_room1;
+		j_room2.north = j_room3;
+		j_room2.east = j_room6;
+		j_room3.north = j_room5;
+		j_room3.west = j_room4;
+		j_room3.south = j_room2;
+		j_room4.east = j_room3;
+		j_room5.south = j_room3;
+		j_room6.west = j_room2;
+		j_room6.south = j_room7;
+		j_room6.north = j_room8;
+		j_room7.north = j_room6;
+		j_room8.south = j_room6;
+		
+		//Create and return world
+		return new world('jotunheim',j_room1,j_room1);
+	}
 }
 
 /*
