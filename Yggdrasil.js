@@ -17,6 +17,7 @@ function yggdrasil()
 	this.worldMidgard = '';
 	this.worldVanaheim = '';
 	this.worldJontunheim = '';
+	this.worldMuspells = '';
 	
 	//Set methods
 	this.startGame = startGame;
@@ -36,6 +37,7 @@ function yggdrasil()
 		worldMidgard = createMidgardWorld();
 		worldVanaheim = createVanaheimWorld();
 		worldJotunheim = createJotunheimWorld();
+		worldMuspells = createMuspellsWorld();
 			
 		//Set current world to Midgard
 		curWorld = worldMidgard;
@@ -144,6 +146,20 @@ function yggdrasil()
 						//Set valid move flag, to process enter events
 						validMove = true;
 					}
+					//Check if vanaheim world target
+					
+					else if( cmd.search( ' MUSPELLS ') != -1)
+					{
+						//Move current world
+						curWorld = worldMuspells;
+						
+						//Change start room
+						curWorld.curRoom = worldMuspells.startRoom;
+						
+						//Set valid move flag, to process enter events
+						validMove = true;
+					}
+				
 				}
 				//Else not in Midgard message user
 				else
@@ -711,7 +727,8 @@ function yggdrasil()
   */
   function message(msg)
   {
-    document.getElementById('messageDisplay').innerHTML +=  msg + '<br>';
+    document.getElementById('messageDisplay').innerHTML =  msg + '<br><br>' 
+        + document.getElementById('messageDisplay').innerHTML;
   }
     
 
@@ -733,7 +750,7 @@ function yggdrasil()
 		//Creates rooms
 		m_room1 = new room("You are in Midgard. Me\'mir stands before you. He tells you that he can warp you to the different worlds in Yggdrasil.(Warp) You can go to " +
 			"Vanaheim, " +
-			"Jotunheim, ",'','','','',[],[],[m_startEvent]);
+			"Jotunheim, Muspells",'','','','',[],[],[m_startEvent]);
 			
 		//Return new world object
 		return new world("Midgard",m_room1,m_room1);
@@ -742,10 +759,10 @@ function yggdrasil()
 	/*
 	Description: Creates Vanaheim world objects. 
 	Map:		4
-				|
+          |
 			6 - 3 -	5
-				|
-				1 -	2
+          |
+          1 -	2
 	Items: 2 - Jewel to skip trickster riddle.
 	       5 - Vault key to unlock door in room 3.
 		   6 - Sword shard.
@@ -785,6 +802,7 @@ function yggdrasil()
 		v_drauger = new event('Drauger','',
 			function()
 			{
+        message('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
 				alert('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
 				moveToMidgard();
 				displayRoom();
@@ -826,9 +844,9 @@ function yggdrasil()
 	/*
 	Description: Creates Jotunheim world objects. 
 	Map:		5
-				|
+          |
 			4 - 3 	8
-				|	|
+          |	  |
 			1 -	2 -	6
 					|
 					7
@@ -950,6 +968,7 @@ function yggdrasil()
 		j_jotunThrow2 = new event('jotun throw bridge',j_moveBridge,
 			function()
 			{
+        message('The jotun throws you off the bridge. You wake up in Midgard.');
 				alert('The jotun throws you off the bridge. You wake up in Midgard.');
 				moveToMidgard();
 				displayRoom();
@@ -1010,6 +1029,230 @@ function yggdrasil()
 		//Create and return world
 		return new world('jotunheim',j_room1,j_room1);
 	}
+	
+	/*
+	Description: Creates muspells world.
+	Map:          6
+                |
+            3   5 - 7
+            |   |
+        8 - 2 - 4
+            |
+            1
+  Events: 2 - Dice Game: 'ROLL DICE' opens path to west room on win, sends back to Midgard on loss.
+          5 - 'USE' <BLUE LAMP, GREEN LAMP, RED LAMP' <LEFT TORCH, MIDDLE TORCH, RIGHT TORCH>
+                Lights torches with corisponding color
+          5 - 'PULL LEVER' Tests combinations. If lit in order Blue, Red Green, opens east door.
+               Else sends back to Midgard.
+  Items:  3 - Green Lamp
+          4 - Blue Lamp
+          6 - Red Lamp
+  Pre-conditions: None.
+  Post-conditions: Creates muspells world object, and returns it.
+	*/
+  function createMuspellsWorld()
+	{
+    //Global helper variables
+    m_torches = [0,0,0];
+   	
+    //Create items
+    m_blueLamp = new item('BLUE LAMP','There is a lamp with a blue flame on a pedistal.(Blue Lamp)');
+    m_greenLamp = new item('GREEN LAMP','There is a lamp with a green flame on a pedistal.(Green Lamp)');
+    m_redLamp = new item('RED LAMP','There is a lamp with a red flame on a pedistal.(Red Lamp)');
+    m_swordShard = new item('SWORD SHARD','In one of its claws it clutches a sword shard.(Sword Shard)');
+    m_leftTorch = new item('LEFT TORCH','');
+    m_middleTorch = new item('MIDDLE TORCH','');
+    m_rightTorch = new item('RIGHT TORCH','');
+    
+    //Create commands
+    m_placeRedLampLeft = new command('USE','RED LAMP','LEFT TORCH');
+    m_placeRedLampMiddle = new command('USE','RED LAMP','MIDDLE TORCH');
+    m_placeRedLampRight = new command('USE','RED LAMP','RIGHT TORCH');
+    m_placeBlueLampLeft = new command('USE','BLUE LAMP','LEFT TORCH');
+    m_placeBlueLampMiddle = new command('USE','BLUE LAMP','MIDDLE TORCH');
+    m_placeBlueLampRight = new command('USE','BLUE LAMP','RIGHT TORCH');
+    m_placeGreenLampLeft = new command('USE','GREEN LAMP','LEFT TORCH');
+    m_placeGreenLampMiddle = new command('USE','GREEN LAMP','MIDDLE TORCH');
+    m_placeGreenLampRight = new command('USE','GREEN LAMP','RIGHT TORCH');
+    m_pullLever = new command('PULL','','LEVER');
+    m_rollDice = new command('ROLL','','DICE');
+    
+    //Create events
+    m_placeRedLeftEvent = new event('Ligth left torch red',m_placeRedLampLeft,
+      function()
+      {
+          m_leftTorch.description = 'The left lamp is lit with a red flame.';
+          m_torches[0] = 1;
+      },false);
+    m_placeRedMiddleEvent = new event('Ligth middle torch red',m_placeRedLampMiddle,
+      function()
+      {
+          m_middleTorch.description = 'The middle lamp is lit with a red flame.';
+          m_torches[1] = 1;
+      },false);
+    m_placeRedRightEvent = new event('Ligth right torch red',m_placeRedLampRight,
+      function()
+      {
+          m_rightTorch.description = 'The right lamp is lit with a red flame.';
+          m_torches[2] = 1;
+      },false);
+      
+    m_placeBlueLeftEvent = new event('Ligth left torch blue',m_placeBlueLampLeft,
+      function()
+      {
+          m_leftTorch.description = 'The left lamp is lit with a blue flame.';
+          m_torches[0] = 3;
+      },false);
+    m_placeBlueMiddleEvent = new event('Ligth middle torch blue',m_placeBlueLampMiddle,
+      function()
+      {
+          m_middleTorch.description = 'The middle lamp is lit with a blue flame.';
+          m_torches[1] = 3;
+      },false);
+    m_placeBlueRightEvent = new event('Ligth right torch blue',m_placeBlueLampRight,
+      function()
+      {
+          m_rightTorch.description = 'The right lamp is lit with a blue flame.';
+          m_torches[2] = 3;
+      },false);
+      
+    m_placeGreenLeftEvent = new event('Ligth left torch green',m_placeGreenLampLeft,
+      function()
+      {
+          m_leftTorch.description = 'The left lamp is lit with a green flame.';
+          m_torches[0] = 2;
+      },false);
+    m_placeGreenMiddleEvent = new event('Ligth middle torch green',m_placeGreenLampMiddle,
+      function()
+      {
+          m_middleTorch.description = 'The middle lamp is lit with a green flame.';
+          m_torches[1] = 2;
+      },false);
+    m_placeGreenRightEvent = new event('Ligth right torch green',m_placeGreenLampRight,
+      function()
+      {
+          m_rightTorch.description = 'The right lamp is lit with a green flame.';
+          m_torches[2] = 2;
+      },false); 
+      
+    m_pullLeverEvent = new event('Pull Lever',m_pullLever,
+          function()
+          {
+
+              if( (m_torches[0] == 3) && (m_torches[1] == 1) && (m_torches[2] == 2) )
+              {
+                  message('The door has opened.');
+                  m_room5.description = 'Your on a bute surrounded by lava. There is a stone circle on the ground with three '
+                        + 'torches and a lever on it. The door to the east is now open. There is a '
+                        + 'rope bridge to the north and south.';
+                  m_room5.events = [];
+                  m_room5.east = m_room7;
+                  
+              }
+              else
+              {
+                  message('A pillar of lava pushes the floor into the sky. You wake up in Midgard.');
+                  alert('A pillar of lava pushes the floor into the sky. You wake up in Midgard.');
+                  m_torches[0] = 0;
+                  m_torches[1] = 0;
+                  m_torches[2] = 0;
+                  m_leftTorch.description = '';
+                  m_middleTorch.description = '';
+                  m_rightTorch.description = '';
+                  moveToMidgard();
+                  displayRoom();
+              }
+          },false);
+          
+    m_diceGameEvent = new event('Dice Game',m_rollDice,
+          function()
+          {
+              var proll1 = Math.floor((Math.random() * 6) + 1);
+              var proll2 = Math.floor((Math.random() * 6) + 1);
+              var proll3 = Math.floor((Math.random() * 6) + 1);
+              var eroll1 = Math.floor((Math.random() * 6) + 1);
+              var eroll2 = Math.floor((Math.random() * 6) + 1);
+              var eroll3 = Math.floor((Math.random() * 6) + 1);
+              var psum = proll1 + proll2 + proll3;
+              var esum = eroll1 + eroll2 + eroll3;
+              
+              message('You roll ' + proll1 + ', ' + proll2 + ', ' + proll3 + '. Your total is ' + psum + '.');
+              message('The imp rolls ' + eroll1 + ', ' + eroll2 + ', ' + eroll3 + '. Its total is ' + esum + '.');
+              
+              if( psum > esum )
+              {
+                message('You win! The imp reconnects the rope bridge.');
+                m_room2.description = 'You are in a dark cave lit only by the surrounding lava. The are rope ' +
+                'bridges to the north and south. The rope bridge leading west is now connected.';
+                m_room2.events = [];
+                m_room2.west = m_room8;
+              }
+              else if( psum == esum )
+              {
+                message('Its a tie. Play again.');
+              }
+              else
+              {
+                message('You lose. The imp sends you back to Midgard.');
+                alert('You lose. The imp sends you back to Midgard.');
+                moveToMidgard();
+                displayRoom();
+              }
+              
+              
+          },false);
+    
+    //Create rooms
+    m_room1 = new room('You are on a cliff surrounded by lava. A rope bridge leads north.','','EXIT','','',[],[],[]);
+     m_room2 = new room(
+      'You are in a dark cave lit only by the surrounding lava. The are rope bridges to the north and south. ' +
+      'There is a broken rope bridge hanging, leading to the west. An Imp stands on the west edge. He tells ' +
+      'you he will repair the bridge if you win a dice game.(ROLL DICE) He tells you if you lose he will ' +
+      'send you back to Midgard.' ,'','','','',[],[m_diceGameEvent],[]);
+    m_room3 = new room('Your on a large rock, surrounded by lava. Lava pours from the ceiling. There is a pedistal ' +
+                        'sticking out of the rock.','','','','',[m_greenLamp],[],[]);
+    m_room4 = new room(
+      'You are on a platform jutting out of a sea of lava. There is a rope bridge leading north, and west.',
+      '','','','',[m_redLamp],[],[]);
+    m_room5 = new room('Your on a bute surrounded by lava. There is a stone circle on the ground with three '
+                        + 'torches and a lever on it. (Left Torch, Middle Torch, Right Torch, Lever) There is a sealed stone door to the east. There is a '
+                        + 'rope bridge to the north and south.','','','','',[m_leftTorch,m_middleTorch,m_rightTorch],
+                        [m_placeRedLeftEvent,m_placeRedMiddleEvent,m_placeRedRightEvent,
+                        m_placeBlueLeftEvent,m_placeBlueMiddleEvent,m_placeBlueRightEvent,
+                        m_placeGreenLeftEvent,m_placeGreenMiddleEvent,m_placeGreenRightEvent,m_pullLeverEvent],
+                        []);
+    m_room6 = new room(
+      'You are in a small cave, lit by the glow of the lava behind you. A pedistal lies in the room.','','','','',
+      [m_blueLamp],[],[]);
+    m_room7 = new room(
+      'There is a giant statue of phenix before you. ','','','','',[m_swordShard],[],[]);
+    m_room8 = new room(
+      'Your on a small platform. On the floor an inscriptions reads: Blue Red Green, then pull lever.','','','','',[],[],[]);
+      
+    //Link rooms
+    m_room1.north = m_room2;
+    //m_room2.west = m_room8;
+    m_room2.south = m_room1;
+    m_room2.north = m_room3;
+    m_room2.east = m_room4;
+    m_room3.south = m_room2;
+    m_room4.west = m_room2;
+    m_room4.north = m_room5;
+    m_room5.south = m_room4;
+    m_room5.north = m_room6;
+    //m_room5.east = m_room7;
+    m_room6.south = m_room5;
+    m_room7.west = m_room5;
+    m_room8.east = m_room2;
+    
+    //Create world 
+    return new world('Muspells',m_room1,m_room1);
+
+	}
+	
+
+	
+	// END OF YGGDRASIL OBJECT //
 }
 
 /*
