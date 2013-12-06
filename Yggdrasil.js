@@ -589,8 +589,6 @@ function yggdrasil()
 	for( var c = 0; c < len; c++ )
 	{
 		//Trigger event code
-		if( curWorld.curRoom.enterEvents[c].name == 'Guess Number Enter' )
-			alert('here');
 		curWorld.curRoom.enterEvents[c].action();
 	}
 			
@@ -879,8 +877,8 @@ function yggdrasil()
 		v_drauger = new event('Drauger','',
 			function()
 			{
-        message('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
-				alert('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
+        message('A drauger jumps out of the darkness and knocks you unconious. You wake up in Alf.');
+				alert('A drauger jumps out of the darkness and knocks you unconious. You wake up in Alf.');
 				moveToAlf();
 				displayRoom();
 			},false);
@@ -1039,15 +1037,16 @@ function yggdrasil()
 		j_jotunThrow = new event('jotun throw','',
 			function()
 			{
-				alert('The jotun is angry with you. He picks you up and throws you to Midgard.');
+				message('The jotun is angry with you. He picks you up and throws you to Alf.');
+				alert('The jotun is angry with you. He picks you up and throws you to Alf.');
 				moveToAlf();
 				displayRoom();
 			},false);
 		j_jotunThrow2 = new event('jotun throw bridge',j_moveBridge,
 			function()
 			{
-        message('The jotun throws you off the bridge. You wake up in Midgard.');
-				alert('The jotun throws you off the bridge. You wake up in Midgard.');
+        message('The jotun throws you off the bridge. You wake up in Alf.');
+				alert('The jotun throws you off the bridge. You wake up in Alf.');
 				moveToAlf();
 				displayRoom();
 			},false);
@@ -1229,8 +1228,8 @@ function yggdrasil()
               }
               else
               {
-                  message('A pillar of lava pushes the floor into the sky. You wake up in Midgard.');
-                  alert('A pillar of lava pushes the floor into the sky. You wake up in Midgard.');
+                  message('A pillar of lava pushes the floor into the sky. You wake up in Alf.');
+                  alert('A pillar of lava pushes the floor into the sky. You wake up in Alf.');
                   m_torches[0] = 0;
                   m_torches[1] = 0;
                   m_torches[2] = 0;
@@ -1271,8 +1270,8 @@ function yggdrasil()
               }
               else
               {
-                message('You lose. The imp sends you back to Midgard.');
-                alert('You lose. The imp sends you back to Midgard.');
+                message('You lose. The imp sends you back to Alf.');
+                alert('You lose. The imp sends you back to Alf.');
                 moveToAlf();
                 displayRoom();
               }

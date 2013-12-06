@@ -1,0 +1,136 @@
+Midgard
+-------
+- Move west
+- move east
+- use gate key <on> village gate
+- move east
+- move east
+
+Alf
+---
+- warp vanaheim
+
+Vanaheim
+--------
+- move east
+- pick up jewel
+- move west
+- move north
+- move east
+* give jewel <to> trickster (to skip riddle)
+  or
+  a stamp - to answer riddle
+- pick up vault key
+- move west
+- use vault key <on> vault door
+- move west
+- pick up sword shard
+* move back to Alf : E, S, W, S
+
+Alf
+---
+- warp jotunheim
+
+Jotunheim
+---------
+- move east
+- move north
+- move west
+* play <Rock,Paper,Sissors> until win
+- pick up sling shot
+- move east
+- move south
+- move east
+- move south
+- pick up stone
+- move north
+- use sling shot <on> jotun
+- move north
+- pick up sword shard
+* move back to alf: S,W,W,W
+
+Alf
+---
+- warp Muspells
+
+Muspells
+--------
+- move north
+* Play dice game to open west room, which has answer to color puzzle
+	be wary if you loss you go back to Alf('mislabeled Midgard in message.)
+        Its unessary with this guide.
+- move north
+- pick up green lamp
+- move south
+- move east
+- pick up red lamp
+- move north
+- move north
+- pick up blue lamp
+- move south
+- use blue lamp left torch
+- use red lamp middle torch
+- use green lamp right torch
+- pull lever (unlocks east door)
+- move east
+- pick up sword shard
+* move back to alf: W,S,W, S, S
+
+Alf
+---
+- warp Niflheim
+
+Niflheim
+--------
+- move west
+- move south
+* 'FLIP COINS' until win game and drops large token (reduces digits to remember in number game.)
+- pick up large token
+- move north
+- move east
+- pick up token (reduces digits to remember)
+- move west
+- move north
+- move east
+- pick up token
+- move west
+- move west
+* Play number guess game:
+	use 'view number' to generate a number for 1 sec, the number of digits is 
+	reduced with tokens in inventory
+	use 'guess number' to guess number. When complete right opens path north
+- move north
+- pick up sword shard
+* move back to alf: S,E,S,W,W
+
+Alf
+---
+- warp svart
+
+Svart
+=====
+- move east
+- move south
+- move south
+- move east
+- move north
+- move east
+- pick up sword shard
+* go back to alf: W,S,W,N,N,W,N
+
+Alf
+===
+- move west
+- create fragarach - to create sword will all 5 pieces
+- move east
+- warp midgard
+
+Midgard
+=======
+- move east
+- move east
+- use fragarach glap and gleip
+
+You Win!
+
+
