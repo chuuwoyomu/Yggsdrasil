@@ -1,0 +1,54 @@
+﻿World: Nifl
+
+Description:
+   For as far as you can see this world is just ice. It's cold. Maybe it would be best not to stay too long. 
+
+Event Description:
+   bird - (enter) randomly removes one item from player
+   encounter - (enter) randomly meets faerie or monster //monster: lose two random items, faerie: randomly gives or takes one gold
+   trap - (trigger) randomly warps to a 'Frozen Tundra' room //has piece
+
+Layout:
+            |-------------------|
+            |                   |
+1 --------- 2 --------- 3       |
+|           |           |       |
+|           |           |       |
+|           |           |       |
+|           |           |       |
+|           4     ----- 5 ------|
+|                 |     |
+|_________________|     |
+                        |
+                        |
+                        6
+
+1: Frozen Tundra
+events - encounter
+items - gold
+description - Ice as far as the eye can see. You could get lost out here.
+
+2: Frozen Tundra
+events - encounter
+items - gold
+description - Ice as far as the eye can see. You could get lost out here.
+
+3: Frozen Tundra
+events - encounter
+items - gold
+description - Ice as far as the eye can see. You could get lost out here.
+
+4: Old Ash Tree
+events - jokul
+items - 
+description - An ancient ash tree clings to a rocky outcropping. It looks similar to the one by your village.
+
+5: Frozen Tundra
+events - encounter
+items - gold
+description - Ice as far as the eye can see. You could get lost out here.
+
+6: Frozen Cave
+events - trap
+items - piece
+description - A small opening catches your eye. You approach it, trying to get a better view. It's a Cave.

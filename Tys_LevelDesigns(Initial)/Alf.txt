@@ -1,0 +1,50 @@
+﻿World: Alf
+
+Description:
+   There doesn't seem to be a sun here. Everything in this world is strange, no shadows for one. Maybe it would be best not to stay too long. 
+
+Event Description:
+   bird - (enter) randomly removes one item from player
+   jokul - (trigger) warp point
+   saga - (enter) tells tale of sword
+   game - (trigger) dice game
+   errand - (trigger) needs five pieces 
+   create - (trigger) needs gift
+   shop - (cmd) can buy things for a price
+   gamble - (cmd) bet gold //two die: even(3x), odd(2x), pair(6x)
+   busy - (enter) apprentice claims he's too busy //lets you in if you have all the pieces
+
+Layout:
+
+            1 ----------|
+            |           |
+            |           |
+            |           |
+            |           |
+2 --------- 3 --------- 4 
+|                       |
+|                       |
+|                       |
+|                       |
+|-----------------------|  
+
+1: Old Ash Tree
+events - bird, jokul 
+items - 
+description - An ancient ash tree sitting in the middle of a small clearing. It looks similar to the one by your village.
+
+2: Blacksmith
+events - create, errand, busy
+items - sword
+description - Volundr's Blacksmith Shop is open and you can hear him working. Loud clanging and an oppressive heat roll out from the furnace.
+
+3: Village
+events - shop, gamble
+items - food, gold, spear, shield, dagger, axe, armor, clothes
+description - the village reminds you of home, minus the leves of course. Through the crowd you spot shop stands and a gambling table. 
+
+4: Mimir's House
+events - saga
+items - 
+description - Mimir's house is richly decorated. The nails were of gold, and the paints of precious stones. Even though it is large and spacious, it feels well lived in and comfortable.
+

@@ -1,0 +1,63 @@
+﻿World: Muspells
+
+Description:
+   As you can see this world is fire. Everything seems to either be fire or on fire. There are rivers of lava, the ground is scorched black, and all the trees are burning. This is truly nowhere you know. It's hot. Maybe it would be best not to stay too long.
+
+Event Description:
+   chance - (enter) randomly does nothing or player loses a weapon
+   fire storm - (enter) randomly does nothing or player loses half all gold
+   game - (trigger) dice game
+
+Layout:
+
+            1           2
+            |           |
+            |           |
+            |           |
+            |           |
+3 --------- 4 --------- 5
+|           |
+|           |
+|           |
+|           |
+6           7 --------- 8
+
+1: Old Ash Tree
+events - jokul 
+items - 
+description - An ancient ash tree stands on the only unburnt patch of earth that you can see. It looks similar to the one by your village.
+
+2: Fire Storm
+events - fire strom
+items - piece
+description - A strong gust of wind picks up the ash and blows it around. Fire takes to the ashes, and the air bursts into flames. The fire consumes all of the air nearby. Everything burns.
+
+3: Burning Forest
+events - chance
+items - 
+description - Surrounded by burning trees, maybe this wasn't the best idea… Hopefully there won't be a fire storm.
+
+4: Fire Storm
+events - fire strom
+items - 
+description - A strong gust of wind picks up the ash and blows it around. Fire takes to the ashes, and the air bursts into flames. The fire consumes all of the air nearby. Everything burns.
+
+5: Burning Forest
+events - chance
+items - 
+description - Surrounded by burning trees, maybe this wasn't the best idea… Hopefully there won't be a fire storm.
+
+6: Burning Forest
+events - chance
+items - 
+description - Surrounded by burning trees, maybe this wasn't the best idea… Hopefully there won't be a fire storm.
+
+7: Burning Forest
+events - chance
+items - 
+description - Surrounded by burning trees, maybe this wasn't the best idea… Hopefully there won't be a fire storm.
+
+8: Burning Forest
+events - chance
+items - 
+description - Surrounded by burning trees, maybe this wasn't the best idea… Hopefully there won't be a fire storm.

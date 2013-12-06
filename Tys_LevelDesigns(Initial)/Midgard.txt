@@ -1,0 +1,47 @@
+﻿World: Midgard
+
+Description:
+   As the sun circles the horizon, the world is bathed in twilight. The sun will not set for another few weeks. The long shadows and strange angles play over everything making familiar things seem new and strange.
+
+Event Description:
+   giants - (enter) fight giants //needs sword
+   jokul - (trigger) must encounter giants first //warp point
+   quest - (enter) gives you quest to slay giants //get items
+   friend - (trigger) gives you weapon //player chooses
+   villager - (trigger) blocks way //removed with rune stone
+   
+
+Layout:
+
+            1            
+            |            
+            |            
+            |            
+            |            
+2 --------- 3 --------- 4 --------- 5
+
+
+1: Old Ash Tree
+events - jokul 
+items -  shield
+description - An ancient ash tree stands along the path to the beach. its gnarled trunk thick enough that teem men could not circle it. This far north trees grow so slowly it must have been here since the beginning. People would leave gifts tucked between the roots as offerings for the spirits. 
+
+2: Chief's House
+events - quest
+items - armor, salve, food, rune stone
+description - The chief's house is in ruins, large sections of the roof have fallen in. Once richly decorated, it looks no different from the hovels at the outskirts of the village. The inside is just as bad as the outside. The tapestries that covered the walls and the rich rugs that lined the floors are in tatters or just plain missing. 
+
+3: Village (start)
+events - friend
+items - axe, dagger, pole arm
+description - The village seems deserted. Abandoned homes, overturned carts and stalls are littered throughout. something strange happened while you were away. 
+
+4: Bog
+events - villager
+items - 
+description - It's hard to see through the fog blanketing the area. The wet ground clung to the soles of your shoes, making it difficult to walk. Even during the peak of summer, walking through the bogs was dangerous, a single misstep and one could drown. Many had disappeared in the bogs. 
+
+5: Hills
+events - giants
+items - 
+description - The barren hills sat at the foot of the mountains that sealed  in the village. It was an ideal location for a village; not many attackers would come by sea, and none would dare cross the mountains this far north. The mountains blocked much of the snow and rain too. Beginning a league away and going off to the horizon, gouges and craters covered the landscape. Those were definitely not there during the past summer. 

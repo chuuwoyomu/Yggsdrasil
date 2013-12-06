@@ -19,6 +19,8 @@ function yggdrasil()
 	this.worldJontunheim = '';
 	this.worldMuspells = '';
 	this.worldNiflheim = '';
+	this.worldSvart = '';
+	this.worldAlf = '';
 	
 	//Set methods
 	this.startGame = startGame;
@@ -40,10 +42,12 @@ function yggdrasil()
 		worldJotunheim = createJotunheimWorld();
 		worldMuspells = createMuspellsWorld();
 		worldNiflheim = createNiflheimWorld();
+		worldSvart = createSvartWorld();
+		worldAlf = createAlfWorld();
 			
 		//Set current world to Midgard
 		curWorld = worldMidgard;
-		
+				
 		//Display room
 		displayRoom();
 			
@@ -100,17 +104,12 @@ function yggdrasil()
 				{
 					viewItems();
 				}
-				//Check for items target noun (same as inventory)
-				else if( cmd.search(' ITEMS ') != -1)
-				{
-					viewIems();
-				}
 			}
-			//Else check warp verb, only for Midgard
+			//Else check warp verb, only for alf
 			else if( cmd.search(' WARP ') != -1)
 			{
-				//Verify in midgard
-				if( curWorld.name == "Midgard" )
+				//Verify in alt
+				if( curWorld.name == "ALF" )
 				{
 					//Check if test world target
 					if( cmd.search( ' TEST WORLD ') != -1)
@@ -172,12 +171,34 @@ function yggdrasil()
 						//Set valid move flag, to process enter events
 						validMove = true;
 					}
+					else if( cmd.search( ' SVART ') != -1)
+					{
+						//Move current world
+						curWorld = worldSvart;
+						
+						//Change start room
+						curWorld.curRoom = worldSvart.startRoom;
+						
+						//Set valid move flag, to process enter events
+						validMove = true;
+					}
+					else if( cmd.search( ' MIDGARD ') != -1)
+					{
+						//Move current world
+						curWorld = worldMidgard;
+						
+						//Change start room
+						curWorld.curRoom = worldMidgard.startRoom;
+						
+						//Set valid move flag, to process enter events
+						validMove = true;
+					}
 				
 				}
 				//Else not in Midgard message user
 				else
 				{
-					message("You can only warp in Midgard.");
+					message("You can only warp to other worlds in Alf.");
 				}
 			}
 			//Else check for reset verb
@@ -241,7 +262,7 @@ function yggdrasil()
 		{
 			if( curWorld.curRoom.north == 'EXIT' )
 			{
-				moveToMidgard();
+				moveToAlf();
 			}
 			else if( curWorld.curRoom.north != '' )
 			{
@@ -254,7 +275,7 @@ function yggdrasil()
 		{
 			if( curWorld.curRoom.south == 'EXIT' )
 			{
-				moveToMidgard();
+				moveToAlf();
 			}
 			else if( curWorld.curRoom.south != '' )
 			{
@@ -267,7 +288,7 @@ function yggdrasil()
 		{
 			if( curWorld.curRoom.west == 'EXIT' )
 			{
-				moveToMidgard();
+				moveToAlf();
 			}
 			else if( curWorld.curRoom.west != '' )
 			{
@@ -280,7 +301,7 @@ function yggdrasil()
 		{
 			if( curWorld.curRoom.east == 'EXIT' )
 			{
-				moveToMidgard();
+				moveToAlf();
 			}
 			else if( curWorld.curRoom.east != '' )
 			{
@@ -410,7 +431,6 @@ function yggdrasil()
 		message('Get <item> - same as Pick Up, see above.');
 		message('Drop <item> - drops item in room. Item must be inventory.');
 		message('View inventory - displays items in inventory.');
-		message('View items - same as View Inventory, see above.');
 		message('Warp <world> - warps to target world. Can only use command in Midgard.');
 		message('Reset - resets game.');
 		message('*** END HELP ***');
@@ -448,7 +468,7 @@ function yggdrasil()
 		message('Reseting game...');
 		startGame();
 	}
-
+	
 	/*
 	Description: Pads the beginning and end of string with a white space, and makes it upper case.
 	Pre-Conditions: str is a string.
@@ -464,11 +484,11 @@ function yggdrasil()
 	Pre-Conditions: World objects are set up properly
 	Post-Conditions: Changes current world object, and starts in start room.
 	*/
-	function moveToMidgard()
+	function moveToAlf()
 	{
 		//Change current world to midgard, and start at start room
-		curWorld = worldMidgard;
-		curWorld.curRoom = worldMidgard.startRoom;
+		curWorld = worldAlf;
+		curWorld.curRoom = worldAlf.startRoom;
 	}
 	
 	/*
@@ -749,30 +769,72 @@ function yggdrasil()
 
  // ### ------------------------------------- World Creation ------------------------------------ ### //
 
-	function createMidgardWorld()
+	/*
+	Description: Creates alf world, a spirit world were you can warp to other worlds, and Volundurs shop is here to create Fragarach.
+	Map:	2 - 1
+	Events: 1 - Start event - gives story intro
+			2 - 'CREATE' 'FRAGARACH' Creates the sword needed to win game if you have 5 sword shards.
+	Items:	2 - Fragarach after finding all shards.
+	Post-Conditions: Creates and returns alf world object.
+	*/
+	function createAlfWorld()
 	{
+		//Create items
+		a_fragarach = new item('FRAGARACH','');
+		
+		//Create commands
+		a_createSword = new command('CREATE','','FRAGARACH');
+		
+		
 		//Create events
-		g_startEvent = new event('Start Event','',
+		a_startEvent = new event('Start Event','',
 			function()
 			{
-				message('Welcome ' + player.name + '. I am Me\'mir. The world of Yggdrasil is in chaos. The twin jotun Glap and Greip are terrorizing the land of Asgard. The souls of the ' +
-						'warriors who died in battle cannot rest in Asgard. They are ' + 
-				        'so hard to defeat as one can revive the other, so they both must be defeated in one blow. The only weapon capable of doing this is ' + 
-						'the legendary sword, Fragarach. It was shattered long ago, but the shards are scattered around Yggdrasil. Find the shards and bring them ' + 
-						'to Volundr the blacksmith in Hel. With the sword you must travel to Asgard and defeat Glap and Greip.');
+				message('Mi\'mir tells you that you, ' + player.name + ' are chosen to defeat Glap and Gleip. He tells you to travel to the 5 plains in Yggdrasil to gather the 5 sword shards of ' +
+						'the Fragarach. The sword can defeat them in one blow so they don\'t keep reviving. Once you have collected the shards, bring them to Voludur to create the sword. Use the Ash Tree to warp between worlds.');
 			},true);
+		a_createSwordEvent = new event('Create Fragarach',a_createSword,
+			function()
+			{
+				var len = player.items.length;
+				var shards = 0;
+				for( var n = 0; n < len; n++ )
+				{
+					if( player.items[n].name === 'SWORD SHARD' )
+						shards++;
+				}
+				
+				if( shards >= 5 )
+				{
+					message('Volundur works tirerously for hours, but finally creates the legendary Fragarach. Now all you must do is say your name backwards to cast activate it.');
+					message('You recieved Fragarach.');
+					player.items.push(a_fragarach);
+					for( var n = len; n >= 0; n--)
+						if( player.items[n].name == 'SWORD SHARD' )
+							player.items.splice(n,1);
+					a_room2.events = [];
+				}
+				else
+				{
+					message('Volundur tells you you need 5 sword shards to make the sword.');
+				}
+			},false);
 			
 		//Creates rooms
-		g_room1 = new room("You are in Midgard. Me\'mir stands before you. He tells you that he can warp you to the different worlds in Yggdrasil.(Warp) You can go to " +
-			"Vanaheim, " +
-			"Jotunheim, Muspells, Niflheim",'','','','',[],[],[g_startEvent]);
+		a_room1 = new room("You stand in front of a great Ash Tree. A blakesmiths shop is to the west. A being named Mi\'mir stands before you. Carved in the tree are the name of worlds: " +
+			"Vanaheim, Jotunheim, Muspells, Niflheim, Svart, Midgard. Warp to these worlds using the tree.(WARP <WORLD NAME>)",'','','','',[],[],[a_startEvent]);
+		a_room2 = new room("You are in the blacksmith Volundur\'s workshop. He works restlessly, ignoring you. (CREATE FRAGARACH)",'','','','',[],[a_createSwordEvent],[]);
+		
+		//link rooms
+		a_room1.west = a_room2;
+		a_room2.east = a_room1;
 			
 		//Return new world object
-		return new world("Midgard",g_room1,g_room1);
+		return new world("ALF",a_room1,a_room1);
 	}
   
 	/*
-	Description: Creates Vanaheim world objects. 
+	Description: Creates Vanaheim world objects. A spirt world with a riddle or fetch game.
 	Map:		4
           |
 			6 - 3 -	5
@@ -819,7 +881,7 @@ function yggdrasil()
 			{
         message('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
 				alert('A drauger jumps out of the darkness and knocks you unconious. You wake up in Midgard.');
-				moveToMidgard();
+				moveToAlf();
 				displayRoom();
 			},false);
 		
@@ -834,7 +896,7 @@ function yggdrasil()
 		}
 		
 		//Create rooms
-		v_room1 = new room("You are in a dark forest. There is an overgrown stone archway to the north. A small break in the dense foilage is to the east. The portal to Midgard is to your south.",'','EXIT','','',[],[],[]);
+		v_room1 = new room("You are in a dark forest. There is an overgrown stone archway to the north. A small break in the dense foilage is to the east. A path leading to the Ash Tree lies south.",'','EXIT','','',[],[],[]);
 		v_room2 = new room("You are in a small clearing surrounded by dense trees.",'','','','',[v_jewel],[],[]);
 		v_room3 = new room("You are in a deralict foyer. There is a locked vault door to the west. The door on the east is open. An ominous dark entryway lies to the north.",'','','','',[],[v_openDoorEvent],[]);
 		v_room4 = new room("You are in an empty storage room.",'','','','',[],[],[v_drauger]);
@@ -857,7 +919,7 @@ function yggdrasil()
 	}
 	
 	/*
-	Description: Creates Jotunheim world objects. 
+	Description: Creates Jotunheim world objects. A giant world with a RPS game and dice game.
 	Map:		5
 				|
 			4 - 3 	8
@@ -978,7 +1040,7 @@ function yggdrasil()
 			function()
 			{
 				alert('The jotun is angry with you. He picks you up and throws you to Midgard.');
-				moveToMidgard();
+				moveToAlf();
 				displayRoom();
 			},false);
 		j_jotunThrow2 = new event('jotun throw bridge',j_moveBridge,
@@ -986,7 +1048,7 @@ function yggdrasil()
 			{
         message('The jotun throws you off the bridge. You wake up in Midgard.');
 				alert('The jotun throws you off the bridge. You wake up in Midgard.');
-				moveToMidgard();
+				moveToAlf();
 				displayRoom();
 			},false);
 		j_jotunBarrier = new event('jotun barrier','',
@@ -1017,7 +1079,7 @@ function yggdrasil()
 			},false);
 			
 		//Create room objects
-		j_room1 = new room('An archway stands before you on the east, that no man could have built. The portal to Midgard lies to the west.','','','','EXIT',[],[],[]);
+		j_room1 = new room('An archway stands before you on the east, that no man could have built. A path leading to the Ash Tree is west.','','','','EXIT',[],[],[]);
 		j_room2 = new room('A giant hallway runs north. Large archways built by jotun lie to your west and east.','','','','',[],[],[]);
 		j_room3 = new room('The hallway continues north and south. A large door lies to the west.','','','','',[],[],[]);
 		j_room4 = new room('Your in a room with a giant chair in the middle.','','','','',[],[j_playRockEvent,j_playPaperEvent,j_playSissorsEvent],[j_playRPSEvent]);
@@ -1047,7 +1109,7 @@ function yggdrasil()
 	}
 	
 	/*
-	Description: Creates muspells world.
+	Description: Creates muspells world. A fire world with a color order puzzle.
 	Map:          6
                 |
             3   5 - 7
@@ -1175,7 +1237,7 @@ function yggdrasil()
                   m_leftTorch.description = '';
                   m_middleTorch.description = '';
                   m_rightTorch.description = '';
-                  moveToMidgard();
+                  moveToAlf();
                   displayRoom();
               }
           },false);
@@ -1211,7 +1273,7 @@ function yggdrasil()
               {
                 message('You lose. The imp sends you back to Midgard.');
                 alert('You lose. The imp sends you back to Midgard.');
-                moveToMidgard();
+                moveToAlf();
                 displayRoom();
               }
               
@@ -1219,7 +1281,7 @@ function yggdrasil()
           },false);
     
     //Create rooms
-    m_room1 = new room('You are on a cliff surrounded by lava. A rope bridge leads north.','','EXIT','','',[],[],[]);
+    m_room1 = new room('You are on a cliff surrounded by lava. A rope bridge leads north. A path leading to the Ash Tree is south.','','EXIT','','',[],[],[]);
      m_room2 = new room(
       'You are in a dark cave lit only by the surrounding lava. The are rope bridges to the north and south. ' +
       'There is a broken rope bridge hanging, leading to the west. An Imp stands on the west edge. He tells ' +
@@ -1267,7 +1329,7 @@ function yggdrasil()
 	}
 	
 	/*
-	Description: Creates muspells world.
+	Description: Creates Niflheim world. An ice world with a coin game and a guessing game.
 	Map:    8      	
 			|		
 			7 - 5 - 6 
@@ -1432,9 +1494,168 @@ function yggdrasil()
 		return new world('NIFLHEIM',n_room1,n_room1);
 	}
 	
+	/*
+	Description: Creates Svart world. A lost forest type world, you must use trial and error to find the right path.
+	Map:    1 - 2
+				|	
+				3   6 - 7
+				|   |
+				4 - 5
+	Items:	7 - sword shard			
+	Pre-conditions: None.
+	Post-conditions: Creates Svart world object, and returns it.
+	*/
 	function createSvartWorld()
 	{
+		//Create items
+		s_swordShard = new item('SWORD SHARD','A sword shard is stuck in a log.(SWORD SHARD)');
+		
+		//Command objects
+		s_moveNorth = new command('MOVE','','NORTH');
+		s_moveSouth = new command('MOVE','','SOUTH');
+		s_moveWest = new command('MOVE','','WEST');
+		s_moveEast = new command('MOVE','','EAST');
+		
+		//Event objects
+		s_moveNorthEvent = new event('Move Block', s_moveNorth, moveFirstRoom );
+		s_moveSouthEvent = new event('Move Block', s_moveSouth, moveFirstRoom );
+		s_moveWestEvent = new event('Move Block', s_moveWest, moveFirstRoom );
+		s_moveEastEvent = new event('Move Block', s_moveEast, moveFirstRoom );
+		
+		//Helper functions
+		function moveFirstRoom()
+		{
+			message('You got lost in the haze and found your self in the start of the forest.');
+			curWorld.curRoom = s_room1;
+		}
+		
+		//Create room objects
+		s_room1 = new room('Your in a haze filled forest. You can see in any direction. A path leading to the Ash Tree is north. A single will\'o\'wisp stands before you. It tells you must find your way through the forest.'
+			,'EXIT','','','',[],[s_moveSouthEvent,s_moveWestEvent],[]);
+		s_room2 = new room('Your in a haze filled forest. You can see in any direction. Now two will\'o\'wisps stand before you.','','','','',[],[s_moveNorthEvent, s_moveEastEvent],[]);
+		s_room3 = new room('Your in a haze filled forest. You can see in any direction. Three will\'o\'wisps stand before you.','','','','',[],[s_moveWestEvent,s_moveEastEvent],[]);
+		s_room4 = new room('Your in a haze filled forest. You can see in any direction. Four will\'o\'wisps stand before you.','','','','',[],[s_moveSouthEvent,s_moveWestEvent],[]);
+		s_room5 = new room('Your in a haze filled forest. You can see in any direction. Five will\'o\'wisps stand before you.','','','','',[],[s_moveSouthEvent,s_moveEastEvent],[]);
+		s_room6 = new room('Your in a haze filled forest. You can see in any direction. Six will\'o\'wisps stand before you.','','','','',[],[s_moveNorthEvent,s_moveWestEvent],[]);
+		s_room7 = new room('Your in a bright beautiful clearing. You can see a clear sky above you.','','','','',[s_swordShard],[],[]);
+		
+		//Link rooms
+		s_room1.east = s_room2;
+		s_room2.west = s_room1;
+		s_room2.south = s_room3;
+		s_room3.north = s_room2;
+		s_room3.south = s_room4;
+		s_room4.north = s_room3;
+		s_room4.east = s_room5;
+		s_room5.west = s_room4;
+		s_room5.north = s_room6;
+		s_room6.south = s_room5;
+		s_room6.east = s_room7;
+		s_room7.west = s_room6;
+		
+		
+		//return svart world object
+		return new world('SVART',s_room1,s_room1);
 	}
+	
+	/*
+	Description: Creates alf world, a spirit world were you can warp to other worlds, and Volundurs shop is here to create Fragarach.
+	Map:	2 - 1 - 3 - 4
+	Events: 1 - Start event - gives story intro
+			1 - 'USE' 'GATE KEY' 'VILLAGE GATE' to open door east.
+			1 - 'MOVE' 'NORTH' is blocked until you can warp.
+			3 - 'MOVE' 'EAST' triggers glap and gleip killing you event, sends you to Alf world, then event is deleted.
+			4 - 'USE' 'SWORD' try to fight but fails
+			4 - 'USE' 'FRAGARACH' win game.
+	Items:	2 - Gate key.
+			2 - Sword 
+	Post-Conditions: Creates and returns alf world object.
+	*/
+	function createMidgardWorld()
+	{
+		//Items
+		g_key = new item('GATE KEY','');
+		g_simpleSword = new item('SWORD','');
+		
+		//Commands
+		g_useKey = new command('USE', 'GATE KEY', 'VILLAGE GATE');
+		g_moveNorth = new command('MOVE','','NORTH');
+		g_moveEast = new command('MOVE','','EAST');
+		g_useSword = new command('USE','SWORD','GLAP AND GREIP');
+		g_useFragarach = new command('USE','FRAGARACH','GLAP AND GREIP');
+		
+		//Events
+		g_gameEnterEvent = new event('Game Enter','',
+			function()
+			{
+				message('Glap and Greip, the giants(jotun), have destroyed the human plane of Midgard. You know something must be done to survive. The cheif wishes to talk to you about this.');
+				
+			},true);
+		g_cheifVisitEvent = new event('Visit Cheif','',
+			function()
+			{
+				message('The cheif tells you that you must defeat Glap and Greip or humanity is doomed. He gives you a sword and the gate key. He tells you the their lair is to the east.');
+				player.items.push(g_key);
+				player.items.push(g_simpleSword);
+				message('You recieve gate key and sword.');
+			},true);
+		g_useKeyEvent = new event('Use gate key',g_useKey,
+			function()
+			{
+				g_room1.description = 'Your in your destroyed village. The mayors house is to the west. A path north leads to a large Ash Tree. The village gate is to the east, and is now open.';
+				g_room1.east = g_room3;
+			},true);
+		g_moveNorthEvent = new event('Block north',g_moveNorth,
+			function()
+			{
+				message('A mysterious force pushes you back.');
+			},false);
+		g_moveEastEvent = new event('First Attack Giants',g_moveEast,
+			function()
+			{
+				message('You encounterd Glap and Greip. They mock you as you fly on them with your sword. You kill Glap, but almost an instant later he revies. They laugh as they crush you with one blow...');
+				alert('You encounterd Glap and Greip. They mock you as you fly on them with your sword. You kill Glap, but almost an instant later he revies. They laugh as they crush you with one blow...');
+				g_room1.north = 'EXIT';
+				g_room3.events = [];
+				g_room1.events = [];
+				moveToAlf();
+			},true);
+		g_useSwordEvent = new event('Use simple sword',g_useSword,
+			function()
+			{
+				message('You kill Glap, but almost an instant later he revies. Its of no use, you need to use the Fragarach(FRAGARACH)');
+			}
+			,false);
+		g_useFragEvent = new event('Use Fragarach',g_useFragarach,
+			function()
+			{
+				var msg = 'With one swing you defeat Glap and Greip! The magic sword worked! With out their oppresion, humanity will rebuild and be saved. You truley are a hero! You must return to Alf as a spirit, but you have saved all.';
+				alert(msg);
+				g_room4.description = "You stand over the corpses of Glap and Greip. You have won.";
+			},false);
+			
+		//Create rooms
+		//Glap and Greip. Fragarach
+		g_room1 = new room('Your in your destroyed village. The mayors house is to the west. A path north leads to a large Ash Tree. The village gate is to the east, but it is locked.(VILLAGE GATE)'
+			,'EXIT','','','',[],[g_useKeyEvent,g_moveNorthEvent],[g_gameEnterEvent]);
+		g_room2 = new room('Your in the cheif\'s hut.','','','','',[],[],[g_cheifVisitEvent]);
+		g_room3 = new room('The castle of Glap and Greip stands before you. A large gate to your east leads to their lair. The town gate is to your west.','','','',''
+			,[],[g_moveEastEvent],[]);
+		g_room4 = new room('Your in Glap and Greip\'s large hall.(GLAP AND GREIP) They look at you like you are just an insect, they have no fear of you.','','','',''
+			,[],[g_useSwordEvent,g_useFragEvent],[]);
+			
+		//Link rooms
+		g_room1.west = g_room2;
+		//g_room1.east = g_room3;
+		g_room2.east = g_room1;
+		g_room3.west = g_room1;
+		g_room3.east = g_room4;
+		g_room4.west = g_room3;
+		
+		//Return world object
+		return new world('MIDGARD',g_room1,g_room1);
+	}
+	
 	
 	// END OF YGGDRASIL OBJECT //
 }
