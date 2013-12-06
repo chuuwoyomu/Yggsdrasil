@@ -18,6 +18,7 @@ function yggdrasil()
 	this.worldVanaheim = '';
 	this.worldJontunheim = '';
 	this.worldMuspells = '';
+	this.worldNiflheim = '';
 	
 	//Set methods
 	this.startGame = startGame;
@@ -38,10 +39,11 @@ function yggdrasil()
 		worldVanaheim = createVanaheimWorld();
 		worldJotunheim = createJotunheimWorld();
 		worldMuspells = createMuspellsWorld();
+		worldNiflheim = createNiflheimWorld();
 			
 		//Set current world to Midgard
 		curWorld = worldMidgard;
-			
+		
 		//Display room
 		displayRoom();
 			
@@ -155,6 +157,17 @@ function yggdrasil()
 						
 						//Change start room
 						curWorld.curRoom = worldMuspells.startRoom;
+						
+						//Set valid move flag, to process enter events
+						validMove = true;
+					}
+					else if( cmd.search( ' NIFLHEIM ') != -1)
+					{
+						//Move current world
+						curWorld = worldNiflheim;
+						
+						//Change start room
+						curWorld.curRoom = worldNiflheim.startRoom;
 						
 						//Set valid move flag, to process enter events
 						validMove = true;
@@ -556,6 +569,8 @@ function yggdrasil()
 	for( var c = 0; c < len; c++ )
 	{
 		//Trigger event code
+		if( curWorld.curRoom.enterEvents[c].name == 'Guess Number Enter' )
+			alert('here');
 		curWorld.curRoom.enterEvents[c].action();
 	}
 			
@@ -737,7 +752,7 @@ function yggdrasil()
 	function createMidgardWorld()
 	{
 		//Create events
-		m_startEvent = new event('Start Event','',
+		g_startEvent = new event('Start Event','',
 			function()
 			{
 				message('Welcome ' + player.name + '. I am Me\'mir. The world of Yggdrasil is in chaos. The twin jotun Glap and Greip are terrorizing the land of Asgard. The souls of the ' +
@@ -748,12 +763,12 @@ function yggdrasil()
 			},true);
 			
 		//Creates rooms
-		m_room1 = new room("You are in Midgard. Me\'mir stands before you. He tells you that he can warp you to the different worlds in Yggdrasil.(Warp) You can go to " +
+		g_room1 = new room("You are in Midgard. Me\'mir stands before you. He tells you that he can warp you to the different worlds in Yggdrasil.(Warp) You can go to " +
 			"Vanaheim, " +
-			"Jotunheim, Muspells",'','','','',[],[],[m_startEvent]);
+			"Jotunheim, Muspells, Niflheim",'','','','',[],[],[g_startEvent]);
 			
 		//Return new world object
-		return new world("Midgard",m_room1,m_room1);
+		return new world("Midgard",g_room1,g_room1);
 	}
   
 	/*
@@ -844,9 +859,9 @@ function yggdrasil()
 	/*
 	Description: Creates Jotunheim world objects. 
 	Map:		5
-          |
+				|
 			4 - 3 	8
-          |	  |
+				|	|
 			1 -	2 -	6
 					|
 					7
@@ -860,6 +875,7 @@ function yggdrasil()
 					4 - 'Play' 'Paper' plays paper in RPS
 					4 - 'Play' 'Sissors' plays sissors in RPS
 					6 - 'USe' 'sling shot' 'jotun' kills jotun on bridge.
+					8 - sword shard
 	Preconditions: None.
 	Postconditions: Returns Jotunheim world object.
 	*/
@@ -1250,7 +1266,175 @@ function yggdrasil()
 
 	}
 	
-
+	/*
+	Description: Creates muspells world.
+	Map:    8      	
+			|		
+			7 - 5 - 6 
+				|   
+			1 - 2 - 4
+				|
+				3
+	  Events: 3 - Coin game, drops large token on completion.
+			  3 - 'FLIP' 'COINS' to play
+			  7 - Guess number game. The more tokens the less digits to remember.
+			  7 - 'VIEW' 'NUMBER' views randomly generated number with varying digits
+			  7 - 'GUESS' 'NUMBER' guess a number.
+	  Items:  3 - Large token after wolf event
+			  4 - token
+			  6 - token
+			  8 - sword shard
+	  Pre-conditions: None.
+	  Post-conditions: Creates Niflheim world object, and returns it.
+	*/
+	function createNiflheimWorld()
+	{
+		//create items
+		n_token1 = new item('LARGE TOKEN','A token lies on the ice.(Large Token)');
+		n_token2 = new item('TOKEN','A token is embeded on the ice.(Token)');
+		n_token3 = new item('TOKEN','A shiny token catches your eye.(Token)');
+		n_swordShard = new item('SWORD SHARD','A sword shard is stuck in an ice stelagtite.(Sword Shard)');
+		
+		//Create commands
+		n_flipCoin = new command('FLIP','','COINS');
+		n_guessNumber = new command('GUESS','','NUMBER');
+		n_viewNumber = new command('VIEW','','NUMBER');
+		
+		//Create events
+		n_flipCoinEnterEvent = new event('Flip Coin Enter','',
+			function()
+			{
+				appendOutputText('A wolf made of ice jeers at you. It asks you to flip three coins. If you get three heads it will give you a token.(Flip Coins)');
+			},false);
+		n_flipCoinEvent = new event('Flip Coin Game',n_flipCoin,
+			function()
+			{
+				var coin1 = (Math.floor( Math.random() * 2 ) == 1) ? 'H' : 'T';
+				var coin2 = (Math.floor( Math.random() * 2 ) == 1) ? 'H' : 'T';
+				var coin3 = (Math.floor( Math.random() * 2 ) == 1) ? 'H' : 'T';
+				var total = 0;
+				
+				message( 'You flipped ' + coin1 + ', ' + coin2 + ', ' + coin3 + '.');
+				
+				if( coin1 == 'H' )
+					total++;
+				if( coin2 == 'H' )
+					total++;
+				if( coin3 == 'H' )
+					total++;
+					
+				if( total > 1 )
+				{
+					message('You win! The ice wolf drops a token.');
+					n_room3.items = [n_token1];
+					n_room3.events = [];
+					n_room3.enterEvents = [];
+					
+				}
+				else
+				{
+					message('You lose. The wolf just grins at you.');
+				}
+				
+				
+			}
+			,false);
+		n_guessNumberEnterEvent = new event('Guess Number Enter','',
+			function()
+			{
+				appendOutputText('Its hand blocks the north path. He tells you he will let you pass if you can remeber his number.(VIEW NUMBER,GUESS NUMBER) He tells you the number ' +
+					'will be smaller if you have tokens.');
+				
+			}
+			,false);
+		n_guessNumberInitNumEvent = new event('Init num','',
+			function()
+			{
+				num = -1;
+			},true);
+		n_viewNumberEvent = new event('View Number',n_viewNumber,
+			function()
+			{
+				var len = player.items.length;
+				var tokens = 0;
+				var bigToken = 0;
+				for( var n = 0; n < len; n++ )
+				{
+					if( player.items[n].name === 'TOKEN' )
+						tokens++;
+						
+					if( player.items[n].name === 'LARGE TOKEN')
+						bigToken++;
+				}
+				
+				var digits = 10 - ( tokens) - ( 2 * bigToken );
+				num = Math.floor( Math.random() * ( Math.pow(10,digits) - Math.pow(10,digits - 1) ) ) + Math.pow(10,digits - 1);
+				
+				myWindow = window.open("","Number","width=200,height=100, titlebar=no, top=300, left=500");
+				myWindow.document.write(num);
+				setTimeout(function(){myWindow.close();},1000);
+			},false);
+		n_guessNumberEvent = new event('Guess Number Game',n_guessNumber,
+			function()
+			{
+				if( num == -1 )
+				{
+					message('First VIEW a NUMBER.');
+				}
+				else
+				{
+					var guess = parseFloat( prompt('Enter Number:','') );
+					if( guess == num )
+					{
+						message('You win! The ice jotun moves his hand.');
+						
+						n_room7.events = [];
+						n_room7.startEvents = [];
+						n_guessNumberEnterEvent.action = new function(){ };
+						n_room7.north = n_room8;
+						displayRoom();
+					}
+					else
+					{
+						message('Wrong guess. View another number.');
+					}
+				}
+			}
+			,false);
+			
+		//Create rooms
+		n_room1 = new room('Your in a forest covered in ice. A slick passage lies to the east. A path way to the Ash Tree lies to the west.','','','','EXIT',[],[],[]);
+		n_room2 = new room('Your in a open clearing, with paths in all four directions.','','','','',[],[],[]);
+		n_room3 = new room('Your in a dead end, the cold forest is thick around you.','','','','',[],[n_flipCoinEvent],[n_flipCoinEnterEvent]);
+		n_room4 = new room('Snow drifts block your way, your in a dead end.','','','','',[n_token3],[],[]);
+		n_room5 = new room('The icey path splits east and west.','','','','',[],[],[]);
+		n_room6 = new room('A large frozen lake streches before you for miles.','','','','',[n_token2],[],[]);
+		n_room7 = new room('A snow covered stone building emerges in your sight. A ice jotun\'s head pops over the side of the building and stares at you.','','','',''
+							,[],[n_guessNumberEvent,n_viewNumberEvent],[n_guessNumberEnterEvent,n_guessNumberInitNumEvent]);
+		n_room8 = new room('Water leaked inside the building and froze over. Icy stallegtites hang from the ceiling.','','','','',[n_swordShard],[],[]);
+		
+		//Link rooms
+		n_room1.east = n_room2;
+		n_room2.south = n_room3;
+		n_room2.west = n_room1;
+		n_room2.east = n_room4;
+		n_room2.north = n_room5;
+		n_room3.north = n_room2;
+		n_room4.west = n_room2;
+		n_room5.south = n_room2;
+		n_room5.east = n_room6;
+		n_room5.west = n_room7;
+		n_room6.west = n_room5;
+		n_room7.east = n_room5;
+		n_room8.south = n_room7;
+		
+		//Return new world object
+		return new world('NIFLHEIM',n_room1,n_room1);
+	}
+	
+	function createSvartWorld()
+	{
+	}
 	
 	// END OF YGGDRASIL OBJECT //
 }
